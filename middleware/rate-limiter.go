@@ -1,17 +1,38 @@
 package middleware
 
 import (
-	"github.com/didip/tollbooth"
+	"net/http"
+	"sync"
+	"time"
+
 	"github.com/gin-gonic/gin"
+	"golang.org/x/time/rate"
 )
+
+
+var clients = make(map[string]*rate.Limiter)
+var mtx sync.Mutex
+
+func getClientLimiter(ip string) *rate.Limiter {
+    mtx.Lock()
+    defer mtx.Unlock()
+
+    lim, exists := clients[ip]
+    if !exists {
+        lim = rate.NewLimiter(rate.Every(time.Second), 30)
+        clients[ip] = lim
+    }
+    return lim
+}
+
 func RateLimiterMiddleware() gin.HandlerFunc {
-	throttle := tollbooth.NewLimiter(1, nil)
-	return func(c *gin.Context) {
-		if throttle.LimitReached(c.ClientIP()) {
-			c.JSON(429, gin.H{"error": "Too Many Requests"})
-			c.Abort()
-			return
-		}
-	}
-	
+    return func(c *gin.Context) {
+        limiter := getClientLimiter(c.ClientIP())
+
+        if !limiter.Allow() {
+            c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{"error": "Too Many Requests"})
+            return
+        }
+        c.Next()
+    }
 }
