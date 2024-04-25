@@ -5,12 +5,14 @@ package main
 import (
 	"gin-framework/src/book"
 
+	middleware "gin-framework/middleware"
+
 	"github.com/gin-gonic/gin"
 )
 
 // route end point
 func router(r *gin.Engine)  {
-	r.GET("/", func(c *gin.Context) {
+	r.GET("/", middleware.RateLimiterMiddleware(), func(c *gin.Context) {
 		c.JSON(200, gin.H{ "message": "Hello World"})
 	})
 	book.SetupRouter(r)
