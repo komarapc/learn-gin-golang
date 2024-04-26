@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	middleware "gin-framework/middleware"
 	"gin-framework/src/book"
 	"github.com/gin-gonic/gin"
@@ -18,9 +17,8 @@ func router(r *gin.Engine) {
 }
 
 func init() {
-	godotenv.Load()
-	gin.SetMode(os.Getenv("GIN_MODE"))
-	fmt.Println("port", os.Getenv("PORT"))
+	godotenv.Load(".env")
+	gin.SetMode(gin.ReleaseMode)
 }
 
 func main() {
