@@ -1,7 +1,5 @@
 package main
 
-// create hello world app
-
 import (
 	"fmt"
 	middleware "gin-framework/middleware"
@@ -14,7 +12,7 @@ import (
 // route end point
 func router(r *gin.Engine) {
 	r.GET("/", middleware.RateLimiterMiddleware(), func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "Hello World"})
+		c.JSON(200, gin.H{"message": "Learn RESTFull API with Gin"})
 	})
 	book.SetupRouter(r)
 }
