@@ -3,24 +3,30 @@ package main
 // create hello world app
 
 import (
-	"gin-framework/src/book"
-
+	"fmt"
 	middleware "gin-framework/middleware"
-
+	"gin-framework/src/book"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"os"
 )
 
 // route end point
-func router(r *gin.Engine)  {
+func router(r *gin.Engine) {
 	r.GET("/", middleware.RateLimiterMiddleware(), func(c *gin.Context) {
-		c.JSON(200, gin.H{ "message": "Hello World"})
+		c.JSON(200, gin.H{"message": "Hello World"})
 	})
 	book.SetupRouter(r)
 }
 
+func init() {
+	godotenv.Load()
+	gin.SetMode(os.Getenv("GIN_MODE"))
+	fmt.Println("port", os.Getenv("PORT"))
+}
+
 func main() {
-	port:="8000"
-	r:= gin.Default()
+	r := gin.Default()
 	router(r)
-	r.Run(":"+port)
+	r.Run(":" + os.Getenv("PORT"))
 }
